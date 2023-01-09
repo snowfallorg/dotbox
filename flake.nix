@@ -2,18 +2,18 @@
   description = "My Nix packages";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
     unstable.url = "github:nixos/nixpkgs";
 
-    snowfall = {
-      url = "github:snowfallorg/lib";
+    snowfall-lib = {
+      url = "github:snowfallorg/lib/dev";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs = inputs:
     let
-      lib = inputs.snowfall.mkLib {
+      lib = inputs.snowfall-lib.mkLib {
         inherit inputs;
 
         src = ./.;
@@ -22,15 +22,20 @@
     lib.mkFlake {
       overlay-package-namespace = "snowfallorg";
 
-      outputs-builder = channels: rec {
-        apps.default = apps.dotbox;
-        apps.dotbox = lib.flake-utils-plus.mkApp {
-          exePath = "/bin/dotbox";
-          drv = channels.nixpkgs.snowfallorg.dotbox;
-        };
-
+      alias = {
         packages.default = "dotbox";
-        devShells.default = "dotbox";
+        shells.default = "dotbox";
+      };
+
+      outputs-builder = channels: {
+        apps = rec {
+          default = dotbox;
+
+          dotbox = lib.flake-utils-plus.mkApp {
+            exePath = "/bin/dotbox";
+            drv = channels.nixpkgs.snowfallorg.dotbox;
+          };
+        };
       };
     };
 }
