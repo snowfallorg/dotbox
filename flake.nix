@@ -15,13 +15,13 @@
       inherit inputs;
 
       src = ./.;
-    };
-  in
-    lib.mkFlake {
+
       snowfall = {
         namespace = "snowfallorg";
       };
-
+    };
+  in
+    lib.mkFlake {
       alias = {
         packages.default = "dotbox";
         shells.default = "dotbox";
