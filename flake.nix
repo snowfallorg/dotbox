@@ -1,26 +1,26 @@
 {
-  description = "Snowfall DotBox";
+  description = "DotBox support for Nix";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
-    unstable.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-23.05";
 
     snowfall-lib = {
-      url = "github:snowfallorg/lib/dev";
+      url = "github:snowfallorg/lib";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = inputs:
-    let
-      lib = inputs.snowfall-lib.mkLib {
-        inherit inputs;
+  outputs = inputs: let
+    lib = inputs.snowfall-lib.mkLib {
+      inherit inputs;
 
-        src = ./.;
-      };
-    in
+      src = ./.;
+    };
+  in
     lib.mkFlake {
-      overlay-package-namespace = "snowfallorg";
+      snowfall = {
+        namespace = "snowfallorg";
+      };
 
       alias = {
         packages.default = "dotbox";
@@ -33,7 +33,7 @@
 
           dotbox = lib.flake-utils-plus.mkApp {
             exePath = "/bin/dotbox";
-            drv = channels.nixpkgs.snowfallorg.dotbox;
+            drv = inputs.self.packages.${channels.nixpkgs.system}.dotbox;
           };
         };
       };
